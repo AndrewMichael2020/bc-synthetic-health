@@ -4,14 +4,17 @@ A Jupyter Notebook that uses Synthea as a state machine to simulate a portion of
 
 ## Overview
 
-This repository contains `fraser_health_onboarding.ipynb`, an interactive controller for generating synthetic health data for Fraser Health using the Synthea simulator with existing assets from the synthea-international repository.
+This repository contains two Jupyter notebooks for generating and validating synthetic health data for Fraser Health:
+
+1. **`fraser_health_onboarding.ipynb`** - Interactive controller for generating synthetic health data using the Synthea simulator
+2. **`fraser_health_validation_tests.ipynb`** - Comprehensive automated testing and clinical validation suite
 
 ### Key Features
 
 - **Uses Existing Assets**: Leverages geography and provider data from synthea-international (no external APIs)
 - **Fraser Health Focus**: Targets British Columbia cities (Surrey, Burnaby, New Westminster, Coquitlam)
 - **Interactive Workflow**: Step-by-step notebook with data inspection, filtering, simulation, and validation
-- **Comprehensive Validation**: Includes visualization dashboard for generated data quality assessment
+- **Comprehensive Validation**: Automated testing suite for demographic parity, geographic integrity, clinical timelines, and FHIR R4 compliance
 
 ## Prerequisites
 
@@ -27,6 +30,9 @@ Before running the notebook, ensure you have:
    - numpy
    - ipywidgets
    - jupyter
+   - haversine (for validation suite)
+   - fhir.resources (for FHIR validation)
+   - scipy (for validation suite)
 
 3. **Git** - For cloning repositories
 
@@ -100,12 +106,66 @@ RANDOM_SEED = 12345    # For reproducibility
 
 ## Output
 
-Generated synthetic data is saved to `synthea/output/csv/` including:
-- `patients.csv` - Patient demographics
-- `encounters.csv` - Healthcare encounters
-- `conditions.csv` - Diagnosed conditions
-- `medications.csv` - Prescribed medications
-- And more...
+Generated synthetic data is saved to `synthea/output/` including:
+- `csv/` directory:
+  - `patients.csv` - Patient demographics
+  - `encounters.csv` - Healthcare encounters
+  - `conditions.csv` - Diagnosed conditions
+  - `medications.csv` - Prescribed medications
+  - And more...
+- `fhir/` directory:
+  - FHIR R4 JSON bundles for each patient
+
+## Validation Suite
+
+After generating data, run the **`fraser_health_validation_tests.ipynb`** notebook to perform comprehensive validation:
+
+### Validation Categories
+
+#### 1. Statistical Demographic Parity
+- **Age Distribution**: Compares median age against BC 2021 Census baseline (42.8 years)
+- **Ethnicity Distribution**: Verifies representation of South Asian and East Asian populations expected in Fraser Health cities
+
+#### 2. Geographic Integrity & Referral Routing
+- **Fraser Health Boundary Check**: Ensures patients reside in target cities (Surrey, Burnaby, New Westminster, Coquitlam)
+- **Provider-Patient Location Matching**: Validates providers are within Fraser Health boundaries
+- **Haversine Distance Check**: Calculates distances between patient homes and providers, flags "teleporting" patients (>100km)
+
+#### 3. Clinical Timeline & FHIR R4 Compliance
+- **Encounter Sequence Validation**: Checks logical ordering of encounters (e.g., inpatient preceded by ambulatory/emergency)
+- **FHIR Bundle Validation**: Validates JSON outputs conform to FHIR R4 standards
+- **BC Address Verification**: Ensures all FHIR resources contain "BC" as the state value
+
+#### 4. Fraser Health Specific Stress Test
+- **Top Conditions Analysis**: Identifies most common diagnoses and verifies expected chronic conditions
+- **Multi-Seed Consistency**: Template for running simulations with different seeds to test stability
+
+### Running Validation
+
+1. **Generate data first**:
+   ```bash
+   jupyter notebook fraser_health_onboarding.ipynb
+   ```
+   Run all cells to generate synthetic data.
+
+2. **Run validation**:
+   ```bash
+   jupyter notebook fraser_health_validation_tests.ipynb
+   ```
+   Run all cells to validate the generated data.
+
+3. **Review results**:
+   The notebook generates:
+   - `validation_report.md` - Human-readable Markdown report
+   - `validation_results.json` - Detailed JSON results
+   - `validation_results.csv` - Tabular test results
+   - Console output with clear PASS/FAIL/WARN indicators
+
+### Interpreting Validation Results
+
+- ✓ **PASS**: Test met all criteria
+- ⚠ **WARN**: Test passed but with minor concerns or missing optional data
+- ✗ **FAIL**: Test did not meet criteria - requires attention
 
 ## Data Sources
 
