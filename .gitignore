@@ -55,3 +55,8 @@ Thumbs.db
 # Backup files
 *.backup
 *.bak
+
+# Validation outputs
+validation_report.md
+validation_results.json
+validation_results.csv
