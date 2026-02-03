@@ -1,0 +1,22 @@
+Unnamed: 0,id,name,address,city,state,zip,county,phone,type,ownership,emergency,quality,LAT,LON
+366,366,Abbotsford Regional Hospital and Cancer Centre,32900 marshall rd,Abbotsford,BC,V2S 0C2,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.037872,-122.312854
+365,365,Abbotsford Regional Hospital and Cancer Care,2179 mccallum rd,Abbotsford,BC,V2S 3P1,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.041893,-122.295136
+654,654,Cottage-Worthington Pavilion,33457 cottage ln,Abbotsford,BC,V2S 0B3,,1-800-622-6232,Hospitals,Canadian Institute for Health Information,Yes,5,49.05,-122.3167
+1635,1635,the Regional Treatment Centre (Pacific),33344 king rd,Abbotsford,BC,V2S 4P4,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.03108579999999,-122.3003157
+415,415,Ashcroft and District Hospital and Community Health Centre,700 ash,Ashcroft,BC,V0K 1A0,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,50.7347718,-121.2801628
+1368,1368,Queen’s Park & Fellburn Care Centres — Fellburn Care Centre,6050 east hastings street,Burnaby,BC,V5B 1R6,,1-800-622-6232,Hospitals,Canadian Institute for Health Information,Yes,5,49.2667,-122.9667
+523,523,Burnaby Hospital,3935 kincaid st,Burnaby,BC,V5G 2X6,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.24947879999999,-123.0157868
+607,607,Chilliwack General Hospital,45600 menholm rd,Chilliwack,BC,V2P 1P7,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.1669926,-121.963068
+1430,1430,Riverview Hospital,2601 lougheed hwy,Coquitlam,BC,V3C 4J2,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.2508389,-122.806171
+693,693,Delta Hospital,5800 mountain view blvd,Delta,BC,V4K 3V6,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.0856773,-123.0618836
+807,807,Fraser Canyon Hospital,1275 7 ave,Hope,BC,V0X 1L4,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.3768382,-121.424275
+1043,1043,Langley Memorial Hospital,22051 fraser hwy,Langley,BC,V3A 4H4,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.0952999,-122.612079
+1056,1056,Lillooet District Hospital and Health Centre,951 murray st,Lillooet,BC,V0K 1V0,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,50.690014,-121.9387906
+1422,1422,Ridge Meadows Hospital,11666 laity st,Maple Ridge,BC,V2X 5A3,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.2161889,-122.63008
+1157,1157,Mission Memorial Hospital,7324 hurd st,Mission,BC,V2V 3H5,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.1351173,-122.3326872
+1450,1450,Royal Columbian Hospital,330 east columbia st,New Westminster,BC,V3L 3W7,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.2264136,-122.8916374
+1369,1369,Queen’s Park & Fellburn Care Centres — Queen’s Park Care Centre,1 Main Street,New Westminster,BC,V3L 5E8,,1-800-622-6232,Hospitals,Canadian Institute for Health Information,Yes,5,49.2069,-122.9111
+725,725,Eagle Ridge Hospital,475 guildford way,Port Moody,BC,V3H 3W9,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.285505,-122.82358
+969,969,Jim Pattison Outpatient Care and Surgery Centre,9750 140 street,Surrey,BC,V3T 0G9,,1-800-622-6232,Hospitals,Province of British Columbia,Yes,5,49.179456,-122.833248
+1582,1582,Surrey Memorial Hospital,13750 96 ave,Surrey,BC,V3V 1Z2,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.1765946,-122.8417742
+1299,1299,Peace Arch Hospital,15521 russell ave,White Rock,BC,V4B 2R4,,1-800-622-6232,Hospitals,Public Health Agency of Canada,Yes,5,49.029968,-122.792231

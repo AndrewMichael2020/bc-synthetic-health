@@ -2,8 +2,11 @@
 synthea/
 synthea-international/
 
-# Configuration directory with filtered data
-config/
+# Generated output (too large for git, regenerate via notebook)
+output/
+
+# Virtual environment files
+*.venv
 
 # Python
 __pycache__/
