@@ -1,3 +1,5 @@
+[![Java 11-21](https://img.shields.io/badge/Java-11--21-orange?logo=openjdk)](https://adoptium.net/) [![Python 3.7+](https://img.shields.io/badge/Python-3.7+-blue?logo=python&logoColor=white)](https://python.org) [![Synthea](https://img.shields.io/badge/Synthea-Synthetic%20Health-green?logo=github)](https://github.com/synthetichealth/synthea) [![FHIR R4](https://img.shields.io/badge/FHIR-R4-red?logo=fire)](https://hl7.org/fhir/R4/) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE) [![BC Health](https://img.shields.io/badge/Region-Fraser%20Health%20BC-purple)](https://www.fraserhealth.ca/)
+
 # bc-synthetic-health
 
 A Jupyter Notebook that uses Synthea as a state machine to simulate a portion of the Canadian health system, specifically targeting Fraser Health (British Columbia).
@@ -79,11 +81,13 @@ Before running the notebook, ensure you have:
 - Saves prepared CSVs to `config/` directory
 
 ### Section 3: Simulation Execution
-- Deploys filtered data to Synthea resources directory
-- Runs Synthea simulation with command:
+- Creates non-destructive Canadian configuration pointing to synthea-international data
+- Runs Synthea simulation with population-weighted distribution across all Fraser Health cities:
   ```bash
-  java -jar synthea-with-dependencies.jar -p 100 -s 12345 "British Columbia" "Surrey"
+  java -jar synthea-with-dependencies.jar -c config/fraser_health.properties -p 10000 -s 12345 "British Columbia"
   ```
+- **BC/CIHI Taxonomy Mapping**: Automatically applies Canadian healthcare terminology mapping (see [Taxonomy Mapping](#bccihi-taxonomy-mapping) section)
+- Previews all generated CSV files with summary statistics
 
 ### Section 4: Validation
 - Loads generated `patients.csv` and `encounters.csv`
@@ -117,6 +121,10 @@ Generated synthetic data is saved to `synthea/output/` including:
   - And more...
 - `fhir/` directory:
   - FHIR R4 JSON bundles for each patient
+
+Example of 100K patients at Fraser Health service area:
+
+![alt text](image.png)
 
 ## Validation Suite
 
@@ -221,8 +229,14 @@ The notebook uses a **non-destructive approach** - it does not modify Synthea's 
 
 This means you can switch between US and Canadian simulations by simply including or omitting the `-c` flag.
 
-### Single City per Run
-Synthea's CLI accepts only one city per simulation. To generate patients across multiple Fraser Health cities, run the simulation multiple times with different city parameters, or omit the city to generate across all cities in the demographics file.
+### Population-Weighted Multi-City Distribution
+When `city=None` is passed to the simulation function, Synthea distributes patients across **all cities** in the demographics file based on population weights. This eliminates the need for multiple simulation runs and provides a more realistic geographic distribution.
+
+### BC/CIHI Taxonomy Integration
+The `BC_CLASS` column is added to `encounters.csv` immediately after simulation, before any preview or validation cells run. This ensures:
+- All CSV previews show Canadian terminology
+- Validation dashboards use FHA-aligned categories
+- Downstream consumers don't need separate translation logic
 
 ## Canadian Healthcare Alignment
 
@@ -231,12 +245,79 @@ Synthea's CLI accepts only one city per simulation. To generate patients across 
 - ✅ **Geography**: Uses Canadian postal codes (V4A format), correct province names
 - ✅ **Demographics**: Based on Canadian Census data from synthea-international
 - ✅ **Providers**: Canadian hospitals and primary care facilities
+- ✅ **BC/CIHI Taxonomy**: Encounter types mapped to CIHI/BC MoH standards (see below)
+- ✅ **Multi-City Distribution**: Patients distributed across all Fraser Health cities by population weight
+
+### BC/CIHI Taxonomy Mapping
+
+Synthea generates encounter types using US healthcare terminology. The notebook automatically maps these to **Canadian Institute for Health Information (CIHI)** and **BC Ministry of Health** standards, which is critical for Fraser Health Authority reporting and data governance.
+
+| Synthea (US) | BC/CIHI Alias | Data Source / Context |
+|--------------|---------------|----------------------|
+| `ambulatory` | `GP_Office` | MSP Fee-for-Service Claims |
+| `wellness` | `Annual_Exam` | Preventative Care |
+| `outpatient` | `Hosp_Clinic` | NACRS Level 1/2 Ambulatory Care |
+| `urgentcare` | `UPCC` | Urgent Primary Care Centre (BC strategic priority) |
+| `emergency` | `ER_Dept` | NACRS Level 3 Emergency |
+| `inpatient` | `Acute_Inpatient` | DAD (Discharge Abstract Database) |
+| `virtual` | `Telehealth` | Virtual Health Services |
+| `snf` | `LongTerm_Care` | Residential/Long-Term Care |
+| `hospice` | `Hospice` | Palliative Care |
+| `home` | `Home_Health` | Community Care Services |
+
+**FHA Budgeting Context:**
+- **MSP Fee-for-Service**: `GP_Office`, `Annual_Exam`, `Telehealth` – billed to Medical Services Plan
+- **Health Authority Global Budget**: `Hosp_Clinic`, `ER_Dept`, `Acute_Inpatient`, `UPCC` – funded through FHA operating budget
+
+The mapping is applied immediately after simulation, adding a `BC_CLASS` column to `encounters.csv` so all downstream analysis uses Canadian terminology.
+
+### Encounter Volume Analysis
+
+#### Is the Volume Ratio Correct?
+
+**Yes, the shape is correct, but the density is likely low.**
+
+With a typical simulation of 10,000 patients, you may observe:
+- ~35,000 Ambulatory + ~15,000 Wellness encounters
+- ~3,000 Emergency encounters
+- **Ratio**: ~16:1 Primary Care to Acute Care
+
+This aligns with the **preventative care models** Fraser Health champions, where most patient interactions occur in community settings rather than acute care.
+
+#### Density Audit
+
+| Metric | Simulated | Real-World BC Benchmark |
+|--------|-----------|------------------------|
+| Encounters per patient-year | ~1.3 | 3–5 visits/year |
+| Primary Care : Acute ratio | ~16:1 | ~10-15:1 |
+
+**Interpretation:**
+- The simulation **under-represents minor acute episodes** (colds, minor injuries, follow-ups) that drive high-frequency GP visits
+- The "Wellness" module follows a strictly annual/bi-annual cadence without enough intervening "sick" visits
+- For production dashboards, consider scaling encounter counts by ~3x to match BC utilization patterns
+
+#### Recommendations for Realistic Density
+1. Increase `POPULATION_SIZE` to generate a larger encounter base
+2. Consider post-processing to inject additional GP visits based on BC utilization rates
+3. Use multiple simulation seeds and aggregate for statistical stability
+
+### Systems Architecture: Data Governance
+
+From a platform perspective, using raw Synthea categories for an FHA dashboard creates **"Data Governance Debt"** – misaligned terminology that requires constant translation downstream.
+
+| Layer | Issue | Solution in This Notebook |
+|-------|-------|---------------------------|
+| **ETL/Bronze** | Raw Synthea `ENCOUNTERCLASS` values | Preserved in original column |
+| **Transform/Silver** | Need BC-aligned categories | `BC_CLASS` column added automatically |
+| **Reporting/Gold** | FHA dashboards expect CIHI terms | Use `BC_CLASS` for all visualizations |
+
+The notebook addresses this at the **Silver layer** by applying the `BC_TAXONOMY_MAP` immediately after data generation, ensuring all downstream consumers (dashboards, validation, exports) work with Canadian terminology.
 
 ### Known Limitations
 - ⚠️ **Clinical Modules**: Disease prevalence models are US-based; BC-specific epidemiology may differ
 - ⚠️ **Medications**: Uses US drug names/NDCs; Canada uses DIN (Drug Identification Numbers)
-- ⚠️ **Provider Types**: Missing BC-specific facilities (e.g., Urgent Primary Care Centres, walk-in clinics)
 - ⚠️ **Wait Times**: Does not model Canadian healthcare wait times for specialists/procedures
+- ⚠️ **Encounter Density**: Simulated visit frequency (~1.3/year) is lower than real BC utilization (~3-5/year)
 
 ### Recommendations for Production Use
 1. Validate generated conditions against BC CDC prevalence data
@@ -247,11 +328,13 @@ Synthea's CLI accepts only one city per simulation. To generate patients across 
 ## Next Steps
 
 ### Planned Enhancements
-1. **Multi-City Generation**: Add loop to generate patients across all Fraser Health cities in a single notebook run
-2. **BC-Specific Modules**: Develop Synthea modules for BC-specific conditions (e.g., higher rates of certain cancers, regional health patterns)
-3. **DIN Medication Mapping**: Create a lookup table to convert US NDC codes to Canadian DIN codes
-4. **FHIR CA Core Profile**: Validate outputs against Canadian FHIR profiles (CA Core)
-5. **Wait Time Modeling**: Add realistic wait times for specialist referrals based on BC health data
+1. ~~**Multi-City Generation**~~: ✅ Implemented - patients now distributed across all Fraser Health cities by population weight
+2. ~~**BC Taxonomy Mapping**~~: ✅ Implemented - encounter types mapped to CIHI/BC MoH standards
+3. **BC-Specific Modules**: Develop Synthea modules for BC-specific conditions (e.g., higher rates of certain cancers, regional health patterns)
+4. **DIN Medication Mapping**: Create a lookup table to convert US NDC codes to Canadian DIN codes
+5. **FHIR CA Core Profile**: Validate outputs against Canadian FHIR profiles (CA Core)
+6. **Wait Time Modeling**: Add realistic wait times for specialist referrals based on BC health data
+7. **Encounter Density Calibration**: Scale visit frequencies to match BC utilization rates (~3-5 visits/year)
 
 ### Community Contributions Welcome
 - Additional BC/Canadian provider data
