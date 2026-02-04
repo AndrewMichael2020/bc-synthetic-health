@@ -1,4 +1,15 @@
-pandas
-matplotlib
-numpy
-ipywidgets
+# Python dependencies for Fraser Health Synthetic Data Generation
+# Install with: pip install -r requirements.txt
+
+# Core data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Jupyter notebook widgets
+ipywidgets>=8.0.0
+
+# Note: Java 11-21 is also required for Synthea (Java 25+ is NOT supported by Gradle)
+# In GitHub Codespaces, Java 21 is available at /home/codespace/java/21.0.9-ms/
