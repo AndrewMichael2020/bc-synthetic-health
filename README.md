@@ -2,7 +2,7 @@
 
 # bc-synthetic-health
 
-A Jupyter Notebook that uses Synthea as a state machine to simulate protocol-based, longitudinal data of the Canadian health system, specifically targeting Fraser Health (British Columbia).
+A Jupyter Notebook has everything to use Synthea as a state machine to simulate protocol-based, longitudinal data of the Canadian health system, specifically targeting Fraser Health (British Columbia).
 
 ## Overview
 
