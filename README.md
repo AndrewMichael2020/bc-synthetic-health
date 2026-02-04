@@ -124,7 +124,8 @@ Generated synthetic data is saved to `synthea/output/` including:
 
 Example of 100K patients at Fraser Health service area:
 
-![alt text](image.png)
+<img width="1384" height="911" alt="image" src="https://github.com/user-attachments/assets/b717065e-9bca-416d-9465-ff2507ab93a2" />
+
 
 ## Validation Suite
 
